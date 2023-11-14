@@ -3,8 +3,9 @@ from werkzeug.utils import secure_filename
 import os
 import cv2
 
-UPLOAD_FOLDER = 'Image Editing:OpenCv-Flask/static/images'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+UPLOAD_FOLDER = '/workspaces/codespaces-flask/Image Editing:OpenCv-Flask/static/images'
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -16,34 +17,38 @@ def allowed_file(filename):
 
 
 def ProcessImage(filename, operation):
-    print(f'{operation}:{filename}')
+    # print(f'{operation}:{filename}')
     img = cv2.imread(f"static/images/{filename}")
     match operation:
         case "cgray":
             imgprocessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            cv2.imwrite(f"static/images/{filename}processed", imgprocessed)
-            return filename
+            newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.{filename.split('.')[1]}"
+            print(newFilename)
+            cv2.imwrite(newFilename, imgprocessed)
+            return newFilename
         case "cpng":
-            imgprocessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            cv2.imwrite(f"static/images/{filename}processed", imgprocessed)
-            return filename
+            newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.png"
+            cv2.imwrite(newFilename, img)
+            return newFilename
         case "cwebp":
-            imgprocessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            cv2.imwrite(f"static/images/{filename}processed", imgprocessed)
-            return filename
+            newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.webp"
+            cv2.imwrite(newFilename, img)
+            return newFilename
         case "cjpg":
-            imgprocessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            cv2.imwrite(f"static/images/{filename}processed", imgprocessed)
-            return filename
+            newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.jpg"
+            cv2.imwrite(newFilename, img)
+            return newFilename
 
-
+# Home Page
 @app.route("/")
 def home():
     return render_template("index.html")
 
+# About Page
 @app.route("/about")
 def about():
     return render_template("about.html")
+
 
 @app.route("/edit", methods=['GET','POST'])
 def edit():
@@ -62,8 +67,8 @@ def edit():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            ProcessImage(filename, operation)
-            flash(f"You image has been processed and is available at <a href='/static/images/{filename}processed' target='_blank'>here</a>")
+            filename = ProcessImage(filename, operation)
+            flash(f"You image has been processed and is available at <a href='{filename}' target='_blank'>here</a>")
             return redirect(url_for('home'))
 
     return render_template("index.html")
