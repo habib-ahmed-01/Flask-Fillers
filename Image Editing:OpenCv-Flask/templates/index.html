@@ -39,12 +39,19 @@
       </div>
     </nav>
 
-    {% with messages = get_flashed_messages() %} {% if messages %}
-      {% for message in messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %}
+      {% for category, message in messages %}
+      {% if category == "error" %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> {{ message | safe}}.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% else %}
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         <strong>Success!</strong> {{ message | safe}}.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
+      {% endif %}
       {% endfor %}
     {% endif %} {% endwith %}
 
@@ -54,7 +61,7 @@
       <form action="/edit" method="post" enctype="multipart/form-data">
         <div class="mb-3">
           <label for="formFile" class="form-label">Select image to edit</label>
-          <input class="form-control" type="file" name="file" id="formFile" />
+          <input class="form-control" type="file" name="file" id="formFile"  required/>
         </div>
         <div class="form-floating">
           <select
@@ -63,13 +70,13 @@
             id="floatingSelect"
             aria-label="Floating label select example"
           >
-            <option selected>Choose an Operation</option>
+            <option selected value="">Choose Operation</option>
             <option value="cpng">Convert to PNG</option>
             <option value="cgray">Convert to Grayscale</option>
             <option value="cwebp">Convert to Webp</option>
             <option value="cjpg">Convert to Jpg</option>
           </select>
-          <label for="floatingSelect">Select an editing operations</label>
+          <label for="floatingSelect">Select operation for image</label>
         </div>
         <button type="submit" class="btn btn-success my-4">Submit</button>
       </form>
