@@ -30,23 +30,40 @@ def ProcessImage(filename, operation):
         case "cgray":
             imgprocessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.{filename.split('.')[1]}"
-            print(newFilename)
             cv2.imwrite(newFilename, imgprocessed)
             return newFilename
+        
         # Convert to PNG
         case "cpng":
             newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.png"
             cv2.imwrite(newFilename, img)
             return newFilename
+        
         # Convert to WEBP
         case "cwebp":
             newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.webp"
             cv2.imwrite(newFilename, img)
             return newFilename
+        
         # Convert to JPG
         case "cjpg":
             newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.jpg"
             cv2.imwrite(newFilename, img)
+            return newFilename
+        
+        # Convert to Edge Image
+        case "cedge":
+            imgprocessed = cv2.cvtColor(img, cv2.IMREAD_GRAYSCALE)
+            edges = cv2.Canny(imgprocessed, 100,200)
+            newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.jpg"
+            cv2.imwrite(newFilename, edges)
+            return newFilename
+        
+        # Convert to Blurr Image
+        case "cblur":
+            blur = cv2.blur(img, (5,5))
+            newFilename = f"static/processed-images/{filename.split('.')[0]}-processed.jpg"
+            cv2.imwrite(newFilename, blur)
             return newFilename
 
 
@@ -88,5 +105,5 @@ def edit():
 
     return render_template("index.html")
 
-
-app.run(debug=True)
+if __name__=='__main__':
+    app.run(debug=True)
